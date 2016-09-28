@@ -62,7 +62,7 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class DA0TabelaPr
 		cWhere += "AND DA0_DESCRI LIKE '%" + oJsonParam:descri + "%' "
 	endif
 	
-	cQuery +=  "SELECT DA0_CODTAB, DA0_DESCRI FROM "+ RetSqlName("DA0") +" DA0 "
+	cQuery +=  "SELECT DA0_FILIAL, DA0_CODTAB, DA0_DESCRI FROM "+ RetSqlName("DA0") +" DA0 "
 	cQuery +=  "WHERE DA0.D_E_L_E_T_ = '' "
 	cQuery += cWhere
 	//cQuery +=  " AND DA0_FILIAL = '"+ xFilial("DA0")+"' "

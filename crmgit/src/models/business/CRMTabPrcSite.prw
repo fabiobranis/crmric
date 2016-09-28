@@ -64,7 +64,7 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class CRMTabPrcSi
 	cQuery +=  " SELECT "
 	cQuery +=  " (SELECT COUNT(*) FROM "+ RetSqlName("DA0") +"  TOT WHERE TOT.DA0_FILIAL = '" + xFilial("DA0") + "' AND TOT.D_E_L_E_T_ = '') AS TOT_RECS,"
 	cQuery +=  " (SELECT COUNT(*) FROM "+ RetSqlName("DA0") +"  TOT WHERE TOT.DA0_FILIAL = '" + xFilial("DA0") + "' " + cWhere + " AND TOT.D_E_L_E_T_ = '') AS TOT_FILTER, "
-	cQuery +=  " DA0_CODTAB, DA0_DESCRI FROM "+ RetSqlName("DA0") +" DA0 "
+	cQuery +=  " DA0_FILIAL, DA0_CODTAB, DA0_DESCRI FROM "+ RetSqlName("DA0") +" DA0 "
 	cQuery +=  "WHERE DA0.D_E_L_E_T_ = '' "
 	cQuery += cWhere
 	cQuery +=  " AND DA0_FILIAL = '"+ xFilial("DA0")+"' "
@@ -80,7 +80,7 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class CRMTabPrcSi
 	::nFilteredRegs := (cAliQry)->TOT_RECS
 	while (cAliQry)->(!(eof()))
 
-		aadd(aRet,DA0TabelaPreco():New((cAliQry)->DA0_CODTAB,(cAliQry)->DA0_DESCRI))
+		aadd(aRet,DA0TabelaPreco():New((cAliQry)->DA0_FILIAL, (cAliQry)->DA0_CODTAB,(cAliQry)->DA0_DESCRI))
 		(cAliQry)->(dbskip())
 	enddo
 
