@@ -158,12 +158,13 @@ wsmethod post wsreceive codusu, token wsservice crmcontato
 
 				// percorro o conteúdo do array do json
 				for ni := 1 to len(oJson:endcont)
-
+					
+					cCodAux := ""
 					// verifico se existe o atributo código e se é alteração
 					if AttIsMemberOf(oJson:endcont[ni],"codigo") .and. lAltera
 						cCodAux := oJson:endcont[ni]:codigo
 					endif
-
+					
 					// crio a instância da classe
 					oEndCont := AGAEnderecos():new(cCodCont,cCodAux)
 
@@ -198,7 +199,9 @@ wsmethod post wsreceive codusu, token wsservice crmcontato
 
 		// processamento da aba telefones
 		if AttIsMemberOf(oJson,"telcont")
-
+			
+			cCodAux := ""
+			
 			// valido se é array
 			if valtype(oJson:telcont) == "A"
 

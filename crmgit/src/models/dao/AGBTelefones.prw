@@ -41,6 +41,10 @@ method new(codent,codigo) class AGBTelefones
 	Local aArea		:= AGB->(GetArea())
 	default codigo := GetCodAGB(GetSxeNum("AGB","AGB_CODIGO"))
 	
+	if empty(codigo)
+		codigo := GetCodAGB(GetSxeNum("AGB","AGB_CODIGO"))
+	endif
+	
 	::filial := xFilial("AGB")
 	::deleta := .F.
 	

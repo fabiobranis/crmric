@@ -68,7 +68,7 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class ZA9Forma
 		cWhere += " AND ZA9_FATOR = " + cValToChar(oJsonParam:fator) 
 	endif
 	
-	cQuery +=  "SELECT ZA9_CODIGO, ZA9_TEMPEX, ZA9_FATOR FROM "+ RetSqlName("ZA9") +" ZA9 "
+	cQuery +=  "SELECT ZA9_FILIAL, ZA9_CODIGO, ZA9_TEMPEX, ZA9_FATOR FROM "+ RetSqlName("ZA9") +" ZA9 "
 	cQuery +=  "WHERE ZA9.D_E_L_E_T_ = '' "
 	//cQuery +=  " AND ZA9_FILIAL = '"+ xFilial("ZA9")+"' "
 	cQUery += cWhere
@@ -82,7 +82,7 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class ZA9Forma
 	(cAliQry)->(dbgotop())
 	while (cAliQry)->(!(eof()))
 		
-		aadd(aRet,ZA9Forma():New((cAliQry)->ZA9_CODIGO,(cAliQry)->ZA9_TEMPEX, (cAliQry)->ZA9_FATOR))
+		aadd(aRet,ZA9Forma():New((cAliQry)->ZA9_FILIAL,(cAliQry)->ZA9_CODIGO,(cAliQry)->ZA9_TEMPEX, (cAliQry)->ZA9_FATOR))
 		(cAliQry)->(dbskip())
 	enddo
 

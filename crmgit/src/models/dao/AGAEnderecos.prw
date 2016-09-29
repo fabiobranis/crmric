@@ -46,6 +46,10 @@ method new(codent,codigo) class AGAEnderecos
 	Local aArea		:= AGA->(GetArea())
 	default codigo := GetCodAGA(GetSxeNum("AGA","AGA_CODIGO"))
 	
+	if empty(codigo)
+		codigo := GetCodAGA(GetSxeNum("AGA","AGA_CODIGO"))
+	endif
+	
 	::filial := xFilial("AGA")
 	::deleta := .F.
 	
