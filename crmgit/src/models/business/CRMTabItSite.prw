@@ -53,6 +53,10 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class CRMTabItSit
 	default nPage 		:= 1
 	default cDirection	:= "ASC"
 	
+	if AttIsMemberOf(oJsonParam,"filial")
+		cWhere += "AND DA1_FILIAL LIKE '%" + oJsonParam:filial + "%' "
+	endif
+	
 	if AttIsMemberOf(oJsonParam,"codtab")
 		cWhere += "AND DA1_CODTAB LIKE '%" + oJsonParam:codtab + "%' "
 	endif
@@ -81,7 +85,7 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class CRMTabItSit
 	cQuery +=  " AND B1_COD = DA1_CODPRO "
 	cQuery +=  " AND SB1.D_E_L_E_T_ = '' "
 	cQuery +=  " WHERE TOT.DA1_FILIAL = '" + xFilial("DA1") + "' " + cWhere + " AND TOT.D_E_L_E_T_ = '') AS TOT_FILTER, "
-	cQuery +=  " DA1_ITEM, DA1_CODTAB, DA1_CODPRO, B1_DESC, DA1_PRCVEN, DA1_VLRDES, DA1_GRUPO, DA1_REFGRD, DA1_PERDES, DA1_ATIVO, DA1_ESTADO, DA1_TPOPER, DA1_QTDLOT, DA1_INDLOT ,DA1_MOEDA, DA1_PRCMAX FROM "+ RetSqlName("DA1") +" DA1 "
+	cQuery +=  " DA1_FILIAL, DA1_ITEM, DA1_CODTAB, DA1_CODPRO, B1_DESC, DA1_PRCVEN, DA1_VLRDES, DA1_GRUPO, DA1_REFGRD, DA1_PERDES, DA1_ATIVO, DA1_ESTADO, DA1_TPOPER, DA1_QTDLOT, DA1_INDLOT ,DA1_MOEDA, DA1_PRCMAX FROM "+ RetSqlName("DA1") +" DA1 "
 	cQuery +=  " INNER JOIN "+ RetSqlName("SB1") +" SB1 "
 	cQuery +=  " ON B1_FILIAL = '"+ xFilial("SB1")+"' "
 	cQuery +=  " AND B1_COD = DA1_CODPRO "
@@ -98,7 +102,7 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class CRMTabItSit
 
 	(cAliQry)->(dbgotop())
 	::nTotRegs := (cAliQry)->TOT_RECS
-	::nFilteredRegs := (cAliQry)->TOT_RECS
+	::nFilteredRegs := (cAliQry)->TOT_FILTER
 	while (cAliQry)->(!(eof()))
 
 		aadd(aRet,DA1TabPrecoItem():New(cAliQry))

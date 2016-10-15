@@ -52,7 +52,7 @@ wsmethod post wsreceive key wsservice crmemp
 			for ni := 1 to len(aEmprRet)
 				oEmpre := nil
 				// instância da classe business empresa (model)
-				oEmpre := CRMEmpSite():New(aEmprRet[ni][3],aEmprRet[ni][6],aEmprRet[ni][2],aEmprRet[ni][7])
+				oEmpre := CRMEmpSite():New(aEmprRet[ni][1],aEmprRet[ni][6],aEmprRet[ni][2],aEmprRet[ni][7])
 				
 				oResp:addBody(aArrayForm[1],oEmpre)
 				aadd(aRetorno,oEmpre)

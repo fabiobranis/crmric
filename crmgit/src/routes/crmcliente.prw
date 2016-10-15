@@ -251,6 +251,7 @@ wsmethod post wsreceive codusu, token wsservice crmcliente
 
 		oProspectBus:vincCli(oProspect,oCli)
 		cOper := "Prospect vinclulado ao cliente " + oCli:cod + " - " + oCli:loja
+		LogCRM(oUser:iderp,::aURLParms[1],oCli:cod)
 	case alltrim(::aURLParms[1]) == "vinccontato" .or. alltrim(::aURLParms[1]) == "remcontato"
 		
 		if !AttIsMemberOf(oJson,"cliente")
@@ -323,6 +324,9 @@ wsmethod post wsreceive codusu, token wsservice crmcliente
 			elseif alltrim(::aURLParms[1]) == "remcontato"
 				oContato:delReg()
 				cOper := "Contatos desvinculados do cliente com sucesso"
+			endif
+			if !(empty(cOper))
+				LogCRM(oUser:iderp,::aURLParms[1],oCli:cod)
 			endif
 		next
 		
@@ -402,6 +406,7 @@ wsmethod post wsreceive codusu, token wsservice crmcliente
 			SetRestFault(401, oClienteBus:erroAuto)
 			return .F.
 		endif
+		LogCRM(oUser:iderp,::aURLParms[1],oCli:cod)
 	endif
 	
 	if alltrim(::aURLParms[1]) == "incluir" .or. alltrim(::aURLParms[1]) == "alterar"
@@ -409,16 +414,17 @@ wsmethod post wsreceive codusu, token wsservice crmcliente
 			SetRestFault(401, oClienteBus:erroAuto)
 			return .F.
 		endif
+		LogCRM(oUser:iderp,::aURLParms[1],oCli:cod)
 	endif
 	
 	cResp := '{"status": 200, "body" : {"message": "' + cOper + '"} }'
-	LogCRM(oUser:iderp,::aURLParms[1])
+	
 	// defino a resposta
 	::SetResponse(cResp)
 
 return .T.
 
-static function LogCRM(cCodUser,cOpera)
+static function LogCRM(cCodUser,cOpera,cCodCli)
 	
 	local aDataInc	:= {}
 	local cOperRot	:= iif(cOpera == "incluir","I",iif(cOpera == "alterar","A",iif(cOpera == "vinccontato","V",iif(cOpera == "remcontato","R",iif(cOpera == "prosptocli","P","E")))))
@@ -428,7 +434,7 @@ static function LogCRM(cCodUser,cOpera)
 	aadd(aDataInc,{"ZAF_UNAME",UsrRetName(cCodUser)})
 	aadd(aDataInc,{"ZAF_DATA",dDataBase})
 	aadd(aDataInc,{"ZAF_ENTIDA","SA1"})
-	aadd(aDataInc,{"ZAF_CODIGO",SA1->A1_COD})
+	aadd(aDataInc,{"ZAF_CODIGO",cCodCli})
 	aadd(aDataInc,{"ZAF_OPERA",cOperRot})
 	
 	U_R73A3INC(aDataInc)

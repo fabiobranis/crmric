@@ -330,23 +330,23 @@ Static Function ViewDef()
     //Adicionando os campos do cabeçalho e o grid dos filhos
     oView:AddField('VIEW_ADY',oStPai,'ADYMASTER')
     oView:AddGrid('VIEW_ADZ',oStFilho,'ADZDETAIL')
-    oView:AddGrid('VIEW_ZAA',oStNeto,'ZAADETAIL')
+    //oView:AddGrid('VIEW_ZAA',oStNeto,'ZAADETAIL')
      
     //Setando o dimensionamento de tamanho
-    oView:CreateHorizontalBox('CABEC',25)
-    oView:CreateHorizontalBox('GRID',40)
-    oView:CreateHorizontalBox('GRID2',35)
+    oView:CreateHorizontalBox('CABEC',40)
+    oView:CreateHorizontalBox('GRID',60)
+    //oView:CreateHorizontalBox('GRID2',35)
 
      
     //Amarrando a view com as box
     oView:SetOwnerView('VIEW_ADY','CABEC')
     oView:SetOwnerView('VIEW_ADZ','GRID')
-    oView:SetOwnerView('VIEW_ZAA','GRID2')
+    //oView:SetOwnerView('VIEW_ZAA','GRID2')
      
     //Habilitando título
     oView:EnableTitleView('VIEW_ADY','Proposta')
     oView:EnableTitleView('VIEW_ADZ','Itens')
-    oView:EnableTitleView('VIEW_ZAA','Calendário')
+    //oView:EnableTitleView('VIEW_ZAA','Calendário')
      
     //Percorrendo a estrutura da ADY
     For nAtual := 1 To Len(aStruADY)
@@ -363,14 +363,15 @@ Static Function ViewDef()
             oStFilho:RemoveField(aStruADZ[nAtual][01])
         EndIf
     Next
-     
+    
+    oView:AddUserButton("Teste Calendário","MAGIC_BMP",{|oView|SetCale(oView)},"Teste Calendário") 
     //Percorrendo a estrutura da ZAA
-    For nAtual := 1 To Len(aStruZAA)
+    /*For nAtual := 1 To Len(aStruZAA)
         //Se o campo atual não estiver nos que forem considerados
         If Alltrim(aStruZAA[nAtual][01]) $ cConsZAA
             oStNeto:RemoveField(aStruZAA[nAtual][01])
         EndIf
-    Next
+    Next*/
     
     oView:AddIncrementalField("VIEW_ADZ","ADZ_ITEM")
     
@@ -397,6 +398,11 @@ user function R73A01VLD(oModel)
 	local nj			:= 0
 	local nAux			:= 0
 	local cAux			:= ""
+	
+	// define o calendário de veiculação
+	if !SetCale()
+		return .F.
+	endif
 	
 	for ni := 1 to oGridItens:Length()
 		oGridItens:GoLine(ni)
@@ -721,3 +727,119 @@ Static Function MVCMPRF(cFilJob,aCabecAdy,aLinesAdz,aLinesZAA,cNumPropos,cErroRo
 	oModel:DeActivate()
 	cFilAnt := cFilAux
 return lRet
+
+static function SetCale(oView)
+
+	local lRet	:= .F.
+	local lOk 	:= .F.
+	local aButtons	:= {}
+	local oDlgVeic	:= nil
+	local cCombo1	:= nil
+	local oModelIt	:= oView:GetModel("ADZDETAIL")
+	local oModelCal	:= oView:GetModel("ZAADETAIL")
+	local aItems	:= SetCombo(oModelIt)
+	local cCombo1	:= space(2)
+	local aHeader	:= {}
+	local aCols		:= {}
+	local nOpc 		:= GD_UPDATE
+	local aHdEdit	:= {}
+	private oBrw1
+		
+	// verifico se está vazio, se estiver é porque não há itens
+	if empty(aItems)
+		Help('',1,'NOITEMS',,'Esta proposta não tem itens.',1,0)
+		return .F. 
+	endif
+	
+	// o combo é sempre alimentado com o primeiro item
+	cCombo1 := aItems[1]
+	aHeader := GetHeader(cCombo1,@aHdEdit) 
+	aCols	:= GetCols(cCombo1,oModelIt,oModelCal)
+	
+	// Cria diálogo
+	oDlgVeic := MSDialog():New(180,30,550,1300,'Calendário de Veiculações',,,,,CLR_BLACK,CLR_WHITE,,,.T.)
+	
+	TSay():New(5,15,{||'Mês de exibição'},oDlgVeic,,,,,,.T.,CLR_BLACK,CLR_WHITE,200,20)
+	
+    oCombo1 := TComboBox():New(15,15,{|u|if(PCount()>0,cCombo1:=u,cCombo1)},aItems,100,20,oDlgVeic,,{||Alert('Mudou item da combo')},,,,.T.,,,,,,,,,'cCombo1')
+	oBrw1 := MsNewGetDados():New( 30 , 15, 160, 620,nOpc,"AllwaysTrue()","AllwaysTrue()",,aHdEdit,0,99,"AllwaysTrue()",,"AllwaysTrue()",oDlgVeic,aHeader,aCols)
+	oDlgVeic:bInit := {||EnchoiceBar(oDlgVeic,{||lOk:=.T.,oDlgVeic:End()},{||oDlgVeic:End()},,@aButtons)}
+	// Ativa diálogo centralizado
+  	oDlgVeic:Activate(,,,.T.,{||msgstop('validou!'),.T.},,)
+	
+return lRet
+
+static function SetCombo(oModelIt)
+	
+	local ni	:= 0
+	local aRet	:= {}
+	local aMeses	:= {"Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"}
+	local nMes	:= 0
+	
+	for ni := 1 to oModelIt:Length()
+		oModelIt:GoLine(ni)
+		if nMes != val(oModelIt:GetValue("ADZ_XMESEX",ni))
+			nMes := val(oModelIt:GetValue("ADZ_XMESEX",ni))
+			aadd(aRet,aMeses[nMes])
+		endif
+	next	
+	
+return aRet
+
+static function GetHeader(cMes,aHdEdit)
+
+	local aRet		:= {}
+	local ni		:= 0
+	local aMeses	:= {"Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"}
+	local dDiaRefer	:= ctod("01/" + StrZero(aScan(aMeses,cMes),2) + "/" + cValToChar(year(date())))
+	local nDias		:= day(LastDay(dDiaRefer))
+	local cPicture	:= PesqPict("ZAA","ZAA_QTDE")
+	local nSize		:= TamSX3("ZAA_QTDE")[1] 
+	
+	aadd(aRet,{"Produto","PROD",PesqPict("ADZ","ADZ_PRODUT"),TamSX3("ADZ_PRODUT")[1],0,"","","N","",""})
+	
+	for ni := 1 to nDias
+		aadd(aRet,{StrZero(ni,2),"D_"+StrZero(ni,2),cPicture,nSize,0,"","","N","",""})
+		aadd(aHdEdit,"D_"+StrZero(ni,2))
+	next
+	
+return aRet	
+
+static function GetCols(cMes,oGrid,oGridCal)
+	
+	local ni		:= 0
+	local nj		:= 0
+	local aRet		:= {}
+	local aAux		:= {}
+	local aAuxCal	:= {}
+	local aMeses	:= {"Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"}
+	local dDiaRefer	:= ctod("01/" + StrZero(aScan(aMeses,cMes),2) + "/" + cValToChar(year(date())))
+	local nDias		:= day(LastDay(dDiaRefer))
+	local nMes		:= aScan(aMeses,cMes)
+	
+	for ni := 1 to oGrid:Length()
+		oGrid:GoLine(ni)
+		if nMes == val(oGrid:GetValue("ADZ_XMESEX",ni))
+			aAux := {}
+			aAuxCal := {}
+			aadd(aAux,oGrid:GetValue("ADZ_PRODUT",ni))
+			
+			for nj := 1 to oGridCal:Length()
+				if oGridCal:GetValue("ZAA_QTDE",nj) > 0
+					aadd(aAuxCal,{day(oGridCal:GetValue("ZAA_DTEXIB",nj)),oGridCal:GetValue("ZAA_QTDE",nj)})
+				endif
+			next
+			
+			for nj := 1 to nDias
+				if ascan(aAuxCal,{|x|x[1] == nj}) > 0
+					aadd(aAux,aAuxCal[ascan(aAuxCal,{|x|x[1] == nj})][2])
+				else
+					aadd(aAux,0)
+				endif
+			next
+			aadd(aAux,.F.)
+			aadd(aRet,aAux)
+		endif
+	next
+	
+return aRet

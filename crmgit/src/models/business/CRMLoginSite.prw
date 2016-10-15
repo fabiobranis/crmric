@@ -23,6 +23,8 @@ class CRMLoginSite
 	 */
 	method new() constructor 
 	method doLogin(cPsw)
+	method valUser(cPsw)
+	method ValUsrEmp(cCodEmpL)
 	method usrIsEmp()
 	method valToken(oUser,cToken)
 	method valEmpFil(oUser)
@@ -62,6 +64,38 @@ method doLogin(cPsw) class CRMLoginSite
 		return .T.
 	endif 
 	::erroAuto := "Login inválido - usuário ou senha inválidos"
+return .F.
+
+/*/{Protheus.doc} valUser
+Método que valida o usuário do portal
+@author fabiobranis
+@since 21/04/2016
+@version undefined
+@param cPsw, characters, Password informado no portal
+/*/
+method valUser(cPsw) class CRMLoginSite
+	
+	// teste para ver se o opassword bate
+	if PswName(cPsw)
+		return .T.
+	endif 
+	::erroAuto := "Login inválido - usuário ou senha inválidos"
+return .F.
+
+method ValUsrEmp(cCodEmpL,cCodFilL) class CRMLoginSite
+	
+	Local aEmprUsr	:= PswRet(2)
+	
+	// todos os acessos
+	if aEmprUsr[1][6][1] == "@@@@"
+		return .T.
+	endif
+	
+	// verifica se tem acesso a empresa logada
+	if ascan(aEmprUsr[1][6],cCodEmpL+cCodFilL) > 0
+		return .T.
+	endif
+
 return .F.
 
 method usrIsEmp() class CRMLoginSite

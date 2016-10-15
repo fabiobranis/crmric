@@ -48,7 +48,7 @@ return oModel
 
 static function ViewDef()
 	
-	local oModel	:= FWLoadModel("ZAFMOD")
+	local oModel	:= FWLoadModel("RIC73A03")
 	local oStruZAF	:= FWFormStruct(2,"ZAF")
 	local oView		:= nil
 	
