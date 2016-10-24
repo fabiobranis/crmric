@@ -4,6 +4,7 @@
  
 //Variáveis Estáticas
 Static cTitulo := "Propostas"
+Static aMeses	:= {"Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"}
  
 /*/{Protheus.doc} RIC73A01
 Rotina de manutenção das propostas comerciais 
@@ -743,6 +744,7 @@ static function SetCale(oView)
 	local aCols		:= {}
 	local nOpc 		:= GD_UPDATE
 	local aHdEdit	:= {}
+	private nMes	:= 0
 	private oBrw1
 		
 	// verifico se está vazio, se estiver é porque não há itens
@@ -753,6 +755,7 @@ static function SetCale(oView)
 	
 	// o combo é sempre alimentado com o primeiro item
 	cCombo1 := aItems[1]
+	nMes := ascan(aMeses,aItems[1])
 	aHeader := GetHeader(cCombo1,@aHdEdit) 
 	aCols	:= GetCols(cCombo1,oModelIt,oModelCal)
 	
@@ -761,8 +764,8 @@ static function SetCale(oView)
 	
 	TSay():New(5,15,{||'Mês de exibição'},oDlgVeic,,,,,,.T.,CLR_BLACK,CLR_WHITE,200,20)
 	
-    oCombo1 := TComboBox():New(15,15,{|u|if(PCount()>0,cCombo1:=u,cCombo1)},aItems,100,20,oDlgVeic,,{||Alert('Mudou item da combo')},,,,.T.,,,,,,,,,'cCombo1')
-	oBrw1 := MsNewGetDados():New( 30 , 15, 160, 620,nOpc,"AllwaysTrue()","AllwaysTrue()",,aHdEdit,0,99,"AllwaysTrue()",,"AllwaysTrue()",oDlgVeic,aHeader,aCols)
+    oCombo1 := TComboBox():New(15,15,{|u|if(PCount()>0,cCombo1:=u,cCombo1)},aItems,100,20,oDlgVeic,,{||nMes := oCombo1:nAt},,,,.T.,,,,,,,,,'cCombo1')
+	oBrw1 := MsNewGetDados():New( 30 , 15, 160, 620,nOpc,"AllwaysTrue()","AllwaysTrue()",,aHdEdit,0,99,"u_ValDatZa()",,"AllwaysTrue()",oDlgVeic,aHeader,aCols)
 	oDlgVeic:bInit := {||EnchoiceBar(oDlgVeic,{||lOk:=.T.,oDlgVeic:End()},{||oDlgVeic:End()},,@aButtons)}
 	// Ativa diálogo centralizado
   	oDlgVeic:Activate(,,,.T.,{||msgstop('validou!'),.T.},,)
@@ -773,7 +776,6 @@ static function SetCombo(oModelIt)
 	
 	local ni	:= 0
 	local aRet	:= {}
-	local aMeses	:= {"Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"}
 	local nMes	:= 0
 	
 	for ni := 1 to oModelIt:Length()
@@ -790,7 +792,6 @@ static function GetHeader(cMes,aHdEdit)
 
 	local aRet		:= {}
 	local ni		:= 0
-	local aMeses	:= {"Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"}
 	local dDiaRefer	:= ctod("01/" + StrZero(aScan(aMeses,cMes),2) + "/" + cValToChar(year(date())))
 	local nDias		:= day(LastDay(dDiaRefer))
 	local cPicture	:= PesqPict("ZAA","ZAA_QTDE")
@@ -812,7 +813,6 @@ static function GetCols(cMes,oGrid,oGridCal)
 	local aRet		:= {}
 	local aAux		:= {}
 	local aAuxCal	:= {}
-	local aMeses	:= {"Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"}
 	local dDiaRefer	:= ctod("01/" + StrZero(aScan(aMeses,cMes),2) + "/" + cValToChar(year(date())))
 	local nDias		:= day(LastDay(dDiaRefer))
 	local nMes		:= aScan(aMeses,cMes)
@@ -843,3 +843,50 @@ static function GetCols(cMes,oGrid,oGridCal)
 	next
 	
 return aRet
+
+user function ValDatZa()
+
+	local oModel	:= FwModelActive()
+	local oModelIt	:= oModel:GetModel("ADZDETAIL")
+	local oModelCal	:= oModel:GetModel("ZAADETAIL")
+	local nQtd		:= &(ReadVar())
+	local nQtdAv	:= 0
+	local nDia		:= val(substr(ReadVar(),6))
+	local ni		:= 0
+	local nDayAv	:= 0
+	local nQtdMax	:= 0
+	
+	// se quantidade for zero eu não faço nada
+	if nQtd <= 0
+		return .T.
+	endif
+	
+	//oModelIt:GoLine(n)nMes
+	oModelIt:SeekLine({{"ADZ_PRODUTO",alltrim(aCols[n][1])},{"ADZ_XMESEX",cValToChar(nMes)}})
+	nQtdMax := oModelIt:GetValue("ADZ_QTDVEN",n)
+	for ni := 1 to oModelCal:Length()
+		
+		oModelCal:GoLine(ni)
+		// se o dia for o mesmo e a quantidade também, não faço nada
+		if day(oModelCal:GetValue("ZAA_DTEXIB",ni)) == nDia .and. oModelCal:GetValue("ZAA_QTDE",ni) == nQtd
+			return .T.
+		endif
+		
+	next
+	
+	for ni := 1 to len(aHeader)
+		if aHeader[ni][2] == "PROD"
+			loop
+		endif
+		nDayAv++
+		
+		if nDayAv == nDia
+			nQtdAv += nQtd
+		else
+			nQtdAv += aCols[n][ni]
+		endif
+		
+ 	next
+	
+	
+return .T.
