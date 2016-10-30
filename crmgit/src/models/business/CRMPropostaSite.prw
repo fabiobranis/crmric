@@ -54,7 +54,7 @@ return self
 method valJson(cJson) class CRMPropostaSite
 	
 	Local ni		:= 0
-	Local aAttrMand	:= {"propos","entida","codigo","loja","datprop"}
+	Local aAttrMand	:= {"propos","entida","codigo","loja","datprop","condpg"}
 	
 	// percorro o array de atributos mandatórios
 	for ni := 1 to len(aAttrMand)
@@ -119,6 +119,22 @@ method setCabFromJson(oJson,oPropostaCab) class CRMPropostaSite
 	
 	if AttIsMemberOf(oJson,"dtrevi")
 		oPropostaCab:dtrevi := ctod(oJson:dtrevi)
+	endif
+	
+	if AttIsMemberOf(oJson,"condpg")
+		oPropostaCab:condpg := oJson:condpg
+	endif
+	
+	if AttIsMemberOf(oJson,"xagenc")
+		oPropostaCab:xagenc := oJson:xagenc
+	endif
+	
+	if AttIsMemberOf(oJson,"client")
+		oPropostaCab:client := oJson:client
+	endif
+	
+	if AttIsMemberOf(oJson,"lojent")
+		oPropostaCab:lojent := oJson:lojent
 	endif
 	
 return
@@ -234,6 +250,14 @@ method setItemFromJson(oJson,oItemProposta) class CRMPropostaSite
 	if AttIsMemberOf(oJson,"xtabpr")
 		oItemProposta:xtabpr := oJson:xtabpr
 	endif
+	
+	if AttIsMemberOf(oJson,"xprfat")
+		oItemProposta:xprfat := oJson:xprfat
+	endif
+	
+	if AttIsMemberOf(oJson,"xfilfa")
+		oItemProposta:xfilfa := oJson:xfilfa
+	endif
 
 return
 method setCalendFromJson(oJson,oCalendario) class CRMPropostaSite
@@ -289,6 +313,17 @@ method valCabec(oPropostaCab) class CRMPropostaSite
 		::erroAuto := "Código do vendedor deve ser preenchido"
 		return .F.
 	endif
+	
+	if !(empty(oPropostaCab:condpg))
+		SE4->(dbsetorder(1))
+		if !(SE4->(dbseek(xFilial("SE4") + oPropostaCab:condpg))) 
+			::erroAuto := "Condição de pagamento não cadastrada no sistema, verifique a consulta de Condição de pagamento."
+			return .F.
+		endif
+	else
+		::erroAuto := "Condição de pagamento deve ser preenchida"
+		return .F.
+	endif
 
 return .T.
 
@@ -299,10 +334,10 @@ method valItem(oItemProposta,nLin) class CRMPropostaSite
 		return .F.
 	endif
 	
-	if empty(oItemProposta:xmesex)
+	/*if empty(oItemProposta:xmesex)
 		::erroAuto := "Mes da exibição deve ser preenchido. Linha " + cValToChar(nLin)
 		return .F.
-	endif
+	endif*/
 	
 	if !(empty(oItemProposta:produto))
 		SB1->(dbsetorder(1))
@@ -362,7 +397,7 @@ method valItem(oItemProposta,nLin) class CRMPropostaSite
 		return .F.
 	endif
 	
-	if !(empty(oItemProposta:condpg))
+	/*if !(empty(oItemProposta:condpg))
 		SE4->(dbsetorder(1))
 		if !(SE4->(dbseek(xFilial("SE4") + oItemProposta:condpg))) 
 			::erroAuto := "Condição de pagamento não cadastrada no sistema, verifique a consulta de TES. Linha " + cValToChar(nLin)
@@ -371,7 +406,7 @@ method valItem(oItemProposta,nLin) class CRMPropostaSite
 	else
 		::erroAuto := "Condição de pagamento deve ser preenchida Linha " + cValToChar(nLin)
 		return .F.
-	endif
+	endif*/
 
 return .T.
 method valCalend(oCalendario,nLin) class CRMPropostaSite

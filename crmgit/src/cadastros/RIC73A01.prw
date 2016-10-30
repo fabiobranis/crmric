@@ -320,7 +320,7 @@ Static Function ViewDef()
     Local aStruADZ  := ADZ->(DbStruct())
     Local aStruZAA  := ZAA->(DbStruct())
     Local cConsADY  := "ADY_OPORTU;ADY_REVISA;ADY_DESOPO;ADY_ORCAME;ADY_DESOPO"
-    Local cConsADZ  := ""
+    Local cConsADZ  := "ADZ_XMESEX"
     Local cConsZAA  := ""
     Local nAtual        := 0
      
@@ -331,23 +331,23 @@ Static Function ViewDef()
     //Adicionando os campos do cabeçalho e o grid dos filhos
     oView:AddField('VIEW_ADY',oStPai,'ADYMASTER')
     oView:AddGrid('VIEW_ADZ',oStFilho,'ADZDETAIL')
-    //oView:AddGrid('VIEW_ZAA',oStNeto,'ZAADETAIL')
+    oView:AddGrid('VIEW_ZAA',oStNeto,'ZAADETAIL')
      
     //Setando o dimensionamento de tamanho
     oView:CreateHorizontalBox('CABEC',40)
-    oView:CreateHorizontalBox('GRID',60)
-    //oView:CreateHorizontalBox('GRID2',35)
+    oView:CreateHorizontalBox('GRID',30)
+    oView:CreateHorizontalBox('GRID2',30)
 
      
     //Amarrando a view com as box
     oView:SetOwnerView('VIEW_ADY','CABEC')
     oView:SetOwnerView('VIEW_ADZ','GRID')
-    //oView:SetOwnerView('VIEW_ZAA','GRID2')
+    oView:SetOwnerView('VIEW_ZAA','GRID2')
      
     //Habilitando título
     oView:EnableTitleView('VIEW_ADY','Proposta')
     oView:EnableTitleView('VIEW_ADZ','Itens')
-    //oView:EnableTitleView('VIEW_ZAA','Calendário')
+    oView:EnableTitleView('VIEW_ZAA','Calendário')
      
     //Percorrendo a estrutura da ADY
     For nAtual := 1 To Len(aStruADY)
@@ -365,7 +365,7 @@ Static Function ViewDef()
         EndIf
     Next
     
-    oView:AddUserButton("Teste Calendário","MAGIC_BMP",{|oView|SetCale(oView)},"Teste Calendário") 
+   // oView:AddUserButton("Teste Calendário","MAGIC_BMP",{|oView|SetCale(oView)},"Teste Calendário") 
     //Percorrendo a estrutura da ZAA
     /*For nAtual := 1 To Len(aStruZAA)
         //Se o campo atual não estiver nos que forem considerados
@@ -401,22 +401,22 @@ user function R73A01VLD(oModel)
 	local cAux			:= ""
 	
 	// define o calendário de veiculação
-	if !SetCale()
+	/*if !SetCale()
 		return .F.
 	endif
-	
+	*/
 	for ni := 1 to oGridItens:Length()
 		oGridItens:GoLine(ni)
 		nAux := 0
 		for nj := 1 to oGridCalend:Length()
 			oGridCalend:GoLine(ni)
 			nAux += oGridCalend:GetValue("ZAA_QTDE",nj)
-			if val(oGridItens:GetValue("ADZ_XMESEX",ni)) <> month(oGridCalend:GetValue("ZAA_DTEXIB",nj))
+			/*if val(oGridItens:GetValue("ADZ_XMESEX",ni)) <> month(oGridCalend:GetValue("ZAA_DTEXIB",nj))
 				cAux := "Item da proposta: " + oGridCalend:GetValue("ZAA_ITPROP",nj)
 				cAux += " Data da veiculação: " + cValToChar(oGridCalend:GetValue("ZAA_DTEXIB",nj))
 				Help('',1,'MESEXIB',,'Existe(m) veiculações com mês diferente do item da proposta ' + CRLF +  cAux ,1,0)
 				return .F. 
-			endif
+			endif*/
 		next
 		
 		if nAux <> oGridItens:GetValue("ADZ_QTDVEN",ni)
@@ -676,6 +676,8 @@ Static Function MVCMPRF(cFilJob,aCabecAdy,aLinesAdz,aLinesZAA,cNumPropos,cErroRo
 		oModel:SetValue("ADZDETAIL","ADZ_XTPVEI",aLinesAdz[ni][ascan(aStruADZ,{|x|alltrim(x[1]) == "ADZ_XTPVEI"})])
 		oModel:SetValue("ADZDETAIL","ADZ_DT1VEN",aLinesAdz[ni][ascan(aStruADZ,{|x|alltrim(x[1]) == "ADZ_DT1VEN"})])
 		oModel:SetValue("ADZDETAIL","ADZ_ORCAME",aLinesAdz[ni][ascan(aStruADZ,{|x|alltrim(x[1]) == "ADZ_ORCAME"})])
+		oModel:SetValue("ADZDETAIL","ADZ_XPRFAT",aLinesAdz[ni][ascan(aStruADZ,{|x|alltrim(x[1]) == "ADZ_XPRFAT"})])
+		oModel:SetValue("ADZDETAIL","ADZ_XFILFA",aLinesAdz[ni][ascan(aStruADZ,{|x|alltrim(x[1]) == "ADZ_XFILFA"})])
 		oModel:SetValue("ADZDETAIL","ADZ_PROPOS",cNumPropos)
 		oModel:SetValue("ADZDETAIL","ADZ_REVISA",cRevisa)
 		

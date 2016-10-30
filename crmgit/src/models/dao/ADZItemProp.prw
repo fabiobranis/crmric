@@ -40,6 +40,8 @@ class ADZItemProp
 	data um
 	data xprctb
 	data xtabpr
+	data xprfat
+	data xfilfa
 	data deleta
 
 	method new(propos,item) constructor
@@ -93,6 +95,8 @@ method new(propos,item) class ADZItemProp
 		::um      := ""
 		::xprctb  := 0
 		::xtabpr  := ""
+		::xprfat  := ""
+		::xfilfa  := ""
 	endif
 	
 return ::self
@@ -129,6 +133,8 @@ method setProperties(propos,item) class ADZItemProp
 		::um      := ADZ->ADZ_UM
 		::xprctb  := ADZ->ADZ_XPRCTB
 		::xtabpr  := ADZ->ADZ_XTABPR
+		::xprfat  := ADZ->ADZ_XPRFAT
+		::xfilfa  := ADZ->ADZ_XFILFA
 
 		return.T.
 

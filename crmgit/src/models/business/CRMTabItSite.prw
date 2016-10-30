@@ -48,13 +48,17 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class CRMTabItSit
 	local aRet			:= {}
 	local cWhere		:= ""
 	local cCliCod		:= ""
+	local cFilFil		:= ""
 	default nOrder 		:= 1
 	default nPageLength	:= 10
 	default nPage 		:= 1
 	default cDirection	:= "ASC"
 	
 	if AttIsMemberOf(oJsonParam,"filial")
-		cWhere += "AND DA1_FILIAL LIKE '%" + oJsonParam:filial + "%' "
+		cWhere += "AND DA1_FILIAL = '" + oJsonParam:filial + "' "
+		cFilFil := " DA1_FILIAL = '" + oJsonParam:filial + "' "
+	else
+		cFilFil := " DA1_FILIAL = '" + xFilial("DA1") + "' "
 	endif
 	
 	if AttIsMemberOf(oJsonParam,"codtab")
@@ -78,7 +82,7 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class CRMTabItSit
 	endif
 		
 	cQuery +=  " SELECT "
-	cQuery +=  " (SELECT COUNT(*) FROM "+ RetSqlName("DA1") +"  TOT WHERE TOT.DA1_FILIAL = '" + xFilial("DA1") + "' AND TOT.D_E_L_E_T_ = '') AS TOT_RECS,"
+	cQuery +=  " (SELECT COUNT(*) FROM "+ RetSqlName("DA1") +"  TOT WHERE " + cFilFil + " AND TOT.D_E_L_E_T_ = '') AS TOT_RECS,"
 	cQuery +=  " (SELECT COUNT(*) FROM "+ RetSqlName("DA1") + " TOT "
 	cQuery +=  " INNER JOIN "+ RetSqlName("SB1") +" SB1 "
 	cQuery +=  " ON B1_FILIAL = '"+ xFilial("SB1")+"' "
@@ -92,7 +96,6 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class CRMTabItSit
 	cQuery +=  " AND SB1.D_E_L_E_T_ = '' "
 	cQuery +=  "WHERE DA1.D_E_L_E_T_ = '' "
 	cQUery += cWhere
-	cQuery +=  " AND DA1_FILIAL = '"+ xFilial("DA1")+"' "
 	cQuery +=  "ORDER BY " + aOrder[nOrder] + space(1) + cDirection + space(1)
 	cQuery +=  "OFFSET ((" + cValToChar(nPage) + " - 1) * "+ cValToChar(nPageLength) +") ROWS "
 	cQuery +=  "FETCH NEXT " +cValToChar(nPageLength)+ " ROWS ONLY "

@@ -48,10 +48,19 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class CRMTabPrcSi
 	local aRet			:= {}
 	local cWhere		:= ""
 	local cCliCod		:= ""
+	local cFilFil		:= ""
 	default nOrder 		:= 1
 	default nPageLength	:= 10
 	default nPage 		:= 1
 	default cDirection	:= "ASC"
+	
+	if AttIsMemberOf(oJsonParam,"filial")
+		cWhere += "AND DA0_FILIAL = '" + oJsonParam:filial + "' "
+		cFilFil := " DA0_FILIAL = '" + oJsonParam:filial + "' "
+	else
+		cWhere += "AND DA0_FILIAL = '" + xFilial("DA0") + "' "
+		cFilFil := " DA0_FILIAL = '" + xFilial("DA0") + "' "
+	endif
 	
 	if AttIsMemberOf(oJsonParam,"codtab")
 		cWhere += "AND DA0_CODTAB LIKE '%" + oJsonParam:codtab + "%' "
@@ -62,12 +71,11 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class CRMTabPrcSi
 	endif
 		
 	cQuery +=  " SELECT "
-	cQuery +=  " (SELECT COUNT(*) FROM "+ RetSqlName("DA0") +"  TOT WHERE TOT.DA0_FILIAL = '" + xFilial("DA0") + "' AND TOT.D_E_L_E_T_ = '') AS TOT_RECS,"
-	cQuery +=  " (SELECT COUNT(*) FROM "+ RetSqlName("DA0") +"  TOT WHERE TOT.DA0_FILIAL = '" + xFilial("DA0") + "' " + cWhere + " AND TOT.D_E_L_E_T_ = '') AS TOT_FILTER, "
+	cQuery +=  " (SELECT COUNT(*) FROM "+ RetSqlName("DA0") +"  TOT WHERE " + cFilFil + " AND TOT.D_E_L_E_T_ = '') AS TOT_RECS,"
+	cQuery +=  " (SELECT COUNT(*) FROM "+ RetSqlName("DA0") +"  TOT WHERE TOT.D_E_L_E_T_ = '' " + cWhere + "  ) AS TOT_FILTER, "
 	cQuery +=  " DA0_FILIAL, DA0_CODTAB, DA0_DESCRI FROM "+ RetSqlName("DA0") +" DA0 "
 	cQuery +=  "WHERE DA0.D_E_L_E_T_ = '' "
 	cQuery += cWhere
-	cQuery +=  " AND DA0_FILIAL = '"+ xFilial("DA0")+"' "
 	cQuery +=  "ORDER BY " + aOrder[nOrder] + space(1) + cDirection + space(1)
 	cQuery +=  "OFFSET ((" + cValToChar(nPage) + " - 1) * "+ cValToChar(nPageLength) +") ROWS "
 	cQuery +=  "FETCH NEXT " +cValToChar(nPageLength)+ " ROWS ONLY "

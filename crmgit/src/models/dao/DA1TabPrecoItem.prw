@@ -81,8 +81,9 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class DA1TabPreco
 	
 	if AttIsMemberOf(oJsonParam,"filial")
 		cWhere += "AND DA1_FILIAL = '" + oJsonParam:filial + "' "
+	else
+		cWhere += "AND DA1_FILIAL = '" + xFilial("DA1") + "' "
 	endif
-	
 	if AttIsMemberOf(oJsonParam,"codtab")
 		cWhere += "AND DA1_CODTAB LIKE '%" + oJsonParam:codtab + "%' "
 	endif

@@ -25,6 +25,10 @@ class ADYProposta
 	data xmater
 	data xtpfat
 	data dtrevi
+	data condpg
+	data xagenc
+	data client
+	data lojent
 
 	// atributos ded associação simples com os objetos que irão compor os contatos
 	data aItemProposta
@@ -90,6 +94,11 @@ method new(propos,lIsList) class ADYProposta
 		::xmater   := ""
 		::xtpfat   := ""
 		::dtrevi   := ctod("")
+		::condpg   := "002"
+		::xagenc   := ""
+		::client   := ""
+		::lojent   := ""
+		
 	endif
 
 return ::self
@@ -137,6 +146,10 @@ method setProperties(propos,lIsList) class ADYProposta
 		::xmater   := oModel:GetModel("ADYMASTER"):GetValue("ADY_XMATER")
 		::xtpfat   := oModel:GetModel("ADYMASTER"):GetValue("ADY_XTPFAT")
 		::dtrevi   := oModel:GetModel("ADYMASTER"):GetValue("ADY_DTREVI")
+		::condpg   := oModel:GetModel("ADYMASTER"):GetValue("ADY_CONDPG")
+		::xagenc   := oModel:GetModel("ADYMASTER"):GetValue("ADY_XAGENC")
+		::client   := oModel:GetModel("ADYMASTER"):GetValue("ADY_CLIENT")
+		::lojent   := oModel:GetModel("ADYMASTER"):GetValue("ADY_LOJENT")
 		
 		// itens
 		for ni := 1 to oModel:GetModel("ADZDETAIL"):Length()
@@ -171,6 +184,8 @@ method setProperties(propos,lIsList) class ADYProposta
 			oAux:um      := oModel:GetModel("ADZDETAIL"):GetValue("ADZ_UM")
 			oAux:xprctb  := oModel:GetModel("ADZDETAIL"):GetValue("ADZ_XPRCTB")
 			oAux:xtabpr  := oModel:GetModel("ADZDETAIL"):GetValue("ADZ_XTABPR")
+			oAux:xprfat  := oModel:GetModel("ADZDETAIL"):GetValue("ADZ_XPRFAT")
+			oAux:xfilfa  := oModel:GetModel("ADZDETAIL"):GetValue("ADZ_XFILFA")
 			::aaddItemProp(oAux)
 			
 			// calendário de veiculação
@@ -238,6 +253,10 @@ method save() class ADYProposta
 	oModel:SetValue("ADYMASTER","ADY_XMATER",::xmater)
 	oModel:SetValue("ADYMASTER","ADY_XTPFAT",::xtpfat)
 	oModel:SetValue("ADYMASTER","ADY_DTREVI",::dtrevi)
+	oModel:SetValue("ADYMASTER","ADY_CLIENT",::client)
+	oModel:SetValue("ADYMASTER","ADY_LOJENT",::lojent)
+	oModel:SetValue("ADYMASTER","ADY_XAGENC",::xagenc)
+	oModel:SetValue("ADYMASTER","ADY_CONDPG",::condpg)
 	oModel:SetValue("ADYMASTER","ADY_TABELA",::aItemProposta[1]:xtabpr)
 	
 	oAux := oModel:GetModel("ADZDETAIL")
@@ -265,13 +284,16 @@ method save() class ADYProposta
 		oModel:SetValue("ADZDETAIL","ADZ_XMESEX",::aItemProposta[ni]:xmesex)
 		oModel:SetValue("ADZDETAIL","ADZ_XDETER",::aItemProposta[ni]:xdeter)
 		oModel:SetValue("ADZDETAIL","ADZ_TES",::aItemProposta[ni]:tes)
-		oModel:SetValue("ADZDETAIL","ADZ_CONDPG",::aItemProposta[ni]:condpg)
+		oModel:SetValue("ADZDETAIL","ADZ_CONDPG",::condpg)
 		oModel:SetValue("ADZDETAIL","ADZ_VALDES",::aItemProposta[ni]:valdes)
 		oModel:SetValue("ADZDETAIL","ADZ_XTPVEI",::aItemProposta[ni]:xtpvei)
 		oModel:SetValue("ADZDETAIL","ADZ_DT1VEN",::aItemProposta[ni]:dt1ven)
 		oModel:SetValue("ADZDETAIL","ADZ_ORCAME",::aItemProposta[ni]:orcame)
 		oModel:SetValue("ADZDETAIL","ADZ_PROPOS",::aItemProposta[ni]:propos)
 		oModel:SetValue("ADZDETAIL","ADZ_REVISA",::aItemProposta[ni]:revisa)
+		oModel:SetValue("ADZDETAIL","ADZ_XPRFAT",::aItemProposta[ni]:xprfat)
+		oModel:SetValue("ADZDETAIL","ADZ_XFILFA",::aItemProposta[ni]:xfilfa)
+		
 	next
 	
 	oAux := oModel:GetModel("ZAADETAIL")

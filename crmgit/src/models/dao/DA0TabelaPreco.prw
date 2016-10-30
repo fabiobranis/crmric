@@ -52,6 +52,8 @@ method getList(oJsonParam,nPage,nPageLength,nOrder,cDirection) class DA0TabelaPr
 	
 	if AttIsMemberOf(oJsonParam,"filial")
 		cWhere += "AND DA0_FILIAL = '" + oJsonParam:filial + "' "
+	else
+		cWhere += "AND DA0_FILIAL = '" + xFilial("DA0") + "' "
 	endif
 	
 	if AttIsMemberOf(oJsonParam,"codtab")
